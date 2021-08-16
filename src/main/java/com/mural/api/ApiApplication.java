@@ -27,7 +27,7 @@ public class ApiApplication {
 		return String.format("getting canva %s's info", id);
 	}
 
-	@GetUser("/user/{id}")
+	@GetMapping("/user/{id}")
 	public String getUserInfo(@PathVariable String id) {
 		return String.format("getting user %s's info", id);
 	}
