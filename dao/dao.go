@@ -37,7 +37,7 @@ func (d mongoDao) insertUser(user User) error {
 	userCollection := d.mongoDatabase.Collection("user")
 	ctx, cancel := context.WithTimeout(context.Background(), TIMEOUT_SECOND*time.Second)
 	defer cancel()
-	_, err := userCollection.InsertOne(ctx, user)
+	_, err := userCollection.InsertOne(ctx, user.Bson())
 	return err
 }
 
@@ -46,12 +46,12 @@ func (d mongoDao) updateUserByMicrosoftId(microsoftId string, user User) error {
 	ctx, cancel := context.WithTimeout(context.Background(), TIMEOUT_SECOND*time.Second)
 	defer cancel()
 	filter := bson.D{{"microsoft_id", microsoftId}}
-	replacement := bson.D{{"name", user.Name}, {"canvas", user.Canvas}}
+	replacement := user.Bson()
 	return userCollection.FindOneAndReplace(ctx, filter, replacement).Err()
 }
 
 func (d mongoDao) InsertOrReplaceUserByMicrosoftId(user User) error {
-	user, err := d.FindUserByMicrosoftId(user.MicrosoftId)
+	_, err := d.FindUserByMicrosoftId(user.MicrosoftId)
 	if err == mongo.ErrNoDocuments {
 		return d.insertUser(user)
 	}
