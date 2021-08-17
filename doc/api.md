@@ -1,6 +1,6 @@
 # API 文档
 
-## /api/login
+## POST /api/login
 
 request
 
@@ -20,18 +20,34 @@ respond
     "jwt": "a string"
   },
   "msg": "ok",
+  // 0 是正常 其他是错误
   "retc": 0
 }
 ```
 
-## /api/user
+## GET /api/user/{base64编码后的microsoftID}
+
+respond:
+
+```json
+{
+  "data": {
+    "microsoft_id": "a string",
+    "name": "a string",
+    "canvas": ["canvaId1", "canvaId2"]
+  },
+  "msg": "ok",
+  "retc": 0
+}
+```
+
+## POST /api/user
 
 request:
 
 ```json
 {
-  "type": "insert/update/query",
-  // 如果type是query的话只传microsoft_id否则三个字段都要传
+  "type": "update/insert",
   "data": {
     "microsoft_id": "a string",
     "name": "a string",
@@ -45,14 +61,7 @@ respond:
 
 ```json
 {
-  // 只有查询有data字段
-  "data": {
-    "microsoft_id": "a string",
-    "name": "a string",
-    "canvas": ["canvaId1", "canvaId2"]
-  },
   "msg": "ok",
-  // 0 是正常 其他是错误
   "retc": 0
 }
 ```
@@ -62,3 +71,5 @@ respond:
 0: "ok"
 
 -1: "jwt fail"
+
+-2: "server error"
