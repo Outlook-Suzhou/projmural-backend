@@ -1,6 +1,6 @@
-## API 文档
+# API 文档
 
-# /api/login
+## /api/login
 
 request
 
@@ -24,7 +24,7 @@ respond
 }
 ```
 
-# /api/user
+## /api/user
 
 request:
 
