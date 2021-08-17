@@ -27,6 +27,8 @@ respond
 
 ## GET /api/user/{base64编码后的microsoftID}
 
+jwt 放在 header 的 authorization 里
+
 respond:
 
 ```json
@@ -43,6 +45,8 @@ respond:
 
 ## POST /api/user
 
+jwt 放在 header 的 authorization 里
+
 request:
 
 ```json
@@ -52,8 +56,7 @@ request:
     "microsoft_id": "a string",
     "name": "a string",
     "canvas": ["canvaId1", "canvaId2"]
-  },
-  "jwt": "a string"
+  }
 }
 ```
 
