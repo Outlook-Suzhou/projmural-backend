@@ -6,10 +6,10 @@ import (
 )
 
 type User struct {
-	ID          primitive.ObjectID `bson:"_id,omitempty"`
-	MicrosoftId string             `bson:"microsoft_id,omitempty"`
-	Name        string             `bson:"name,omitempty"`
-	Canvas      []string           `bson:"canvas,omitempty"`
+	ID          primitive.ObjectID `bson:"_id,omitempty" json:"-"`
+	MicrosoftId string             `bson:"microsoft_id,omitempty" json:"microsoft_id"`
+	Name        string             `bson:"name,omitempty" json:"name"`
+	Canvas      []string           `bson:"canvas,omitempty" json:"canvas"`
 }
 
 func (u User) Bson() bson.D {
