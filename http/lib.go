@@ -34,10 +34,9 @@ func okRespWithData(ctx *gin.Context, data *gin.H){
 	})
 }
 
-type routerFunction func(ctx *gin.Context)
 type coreFunction func(ctx *gin.Context) (int, error, *gin.H)
 
-func routerMiddleWare(core coreFunction) routerFunction {
+func RouterMiddleWare(core coreFunction) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		retc, err, data := core(ctx)
 		if retc == RESP_OK_WITH_DATA{
