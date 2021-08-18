@@ -4,44 +4,36 @@ import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
-	"log"
 	"net/http"
 )
 
-type loginRequest struct {
+type LoginRequest struct {
 	AccessToken string `json:"access_token"`
 }
 
-type graphRespond struct {
+type GraphRespond struct {
 	MicrosoftId string `json:"id"`
 }
 
-func login(ctx *gin.Context) (int, error, *gin.H) {
-	data, err := ioutil.ReadAll(ctx.Request.Body)
-	if err != nil {
-		return RESP_SERVER_ERROR, err, &gin.H{}
-	}
-	var request loginRequest
-	err = json.Unmarshal(data, &request)
-	if err != nil {
-		return RESP_SERVER_ERROR, err, &gin.H{}
-	}
+func login(getBody GetBodyFunction) (int, *gin.H) {
+	var request LoginRequest
+	getBody(&request)
 	client := &http.Client{}
 	getRequest, _ := http.NewRequest("GET", GRAPH_ME_ENDPOINT, nil)
 	getRequest.Header.Add("Authorization", "Bearer " + request.AccessToken)
 	respond, err := client.Do(getRequest)
 	if err != nil {
-		return RESP_SERVER_ERROR, err, &gin.H{}
+		panic(err)
 	}
 	defer respond.Body.Close()
 	body, err := ioutil.ReadAll(respond.Body)
 	if err != nil {
-		return RESP_SERVER_ERROR, err, &gin.H{}
+		panic(err)
 	}
-	var graphResp graphRespond
-	json.Unmarshal(body, &graphResp)
-	log.Println(graphResp)
-	if graphResp.MicrosoftId == "" {return RESP_ACCESS_TOKEN_FAIL, nil, &gin.H{}}
+	var graphResp GraphRespond
+	err = json.Unmarshal(body, &graphResp)
+	if err != nil {panic(err)}
+	if graphResp.MicrosoftId == "" {return RESP_ACCESS_TOKEN_FAIL, &gin.H{}}
 	jwt, err := GenerateJWT(graphResp.MicrosoftId)
-	return RESP_OK_WITH_DATA, nil, &gin.H{"jwt": jwt}
+	return RESP_OK_WITH_DATA, &gin.H{"jwt": jwt}
 }

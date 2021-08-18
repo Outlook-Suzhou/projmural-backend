@@ -1,13 +1,16 @@
 package http
 
 import (
+	"encoding/json"
 	"github.com/gin-gonic/gin"
-	"log"
+	"go.mongodb.org/mongo-driver/bson"
+	"io/ioutil"
 )
 
 const (
 	RESP_OK_WITH_DATA = 1
 	RESP_OK = 0
+	RESP_JWT_FAIL = -1
 	RESP_SERVER_ERROR = -2
 	RESP_ACCESS_TOKEN_FAIL = -3
 )
@@ -17,6 +20,11 @@ func quickResp(cmd int, ctx *gin.Context){
 	case RESP_OK:
 		ctx.JSON(200, gin.H{
 			"msg": "ok",
+			"retc": cmd,
+		})
+	case RESP_JWT_FAIL:
+		ctx.JSON(200, gin.H{
+			"msg": "jwt fail",
 			"retc": cmd,
 		})
 	case RESP_SERVER_ERROR:
@@ -40,18 +48,53 @@ func okRespWithData(ctx *gin.Context, data *gin.H){
 	})
 }
 
-type coreFunction func(ctx *gin.Context) (int, error, *gin.H)
+type CoreFunction func(GetBodyFunction) (int, *gin.H)
+type CoreJwtFunction func(function GetBodyFunction, claims *Claims) (int, *gin.H)
+type GetBodyFunction func(interface{})
 
-func RouterMiddleWare(core coreFunction) gin.HandlerFunc {
+func JwtMiddleWare(core CoreJwtFunction) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		retc, err, data := core(ctx)
+		var getBody = func(i interface{}) {
+			data, err := ioutil.ReadAll(ctx.Request.Body)
+			if err != nil {panic(err)}
+			err = bson.Unmarshal(data, i)
+			if err != nil {panic(err)}
+		}
+		jwt, exsit := ctx.Request.Header["Authorization"]
+		if exsit == true {
+			var c *Claims
+			c, err := ParseJWT(jwt[0][7:])
+			if err == nil {
+				retc, data := core(getBody, c)
+				if retc == RESP_OK_WITH_DATA {
+					okRespWithData(ctx, data)
+				} else {
+					quickResp(retc, ctx)
+				}
+			} else {
+				quickResp(RESP_JWT_FAIL, ctx)
+				panic(err)
+			}
+		} else {
+			quickResp(RESP_JWT_FAIL, ctx)
+		}
+		return
+	}
+}
+
+func RouterMiddleWare(core CoreFunction) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var getBody = func(i interface{}) {
+			data, err := ioutil.ReadAll(ctx.Request.Body)
+			if err != nil {panic(err)}
+			err = json.Unmarshal(data, i)
+			if err != nil {panic(err)}
+		}
+		retc, data := core(getBody)
 		if retc == RESP_OK_WITH_DATA{
 			okRespWithData(ctx, data)
 		} else {
 			quickResp(retc, ctx)
-		}
-		if err != nil {
-			log.Println(err)
 		}
 	}
 }

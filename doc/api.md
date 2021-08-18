@@ -27,7 +27,7 @@ respond
 
 ## POST /api/user
 
-jwt 放在 header 的 authorization 里
+jwt 放在 header 的 Authorization 里
 
 request:
 
