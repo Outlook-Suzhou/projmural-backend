@@ -3,7 +3,6 @@ package http
 import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson"
 	"io/ioutil"
 )
 
@@ -52,25 +51,15 @@ type CoreFunction func(GetBodyFunction) (int, *gin.H)
 type CoreJwtFunction func(function GetBodyFunction, claims *Claims) (int, *gin.H)
 type GetBodyFunction func(interface{})
 
-func JwtMiddleWare(ctx gin.Context) {
+func JwtMiddleWare() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var getBody = func(i interface{}) {
-			data, err := ioutil.ReadAll(ctx.Request.Body)
-			if err != nil {panic(err)}
-			err = bson.Unmarshal(data, i)
-			if err != nil {panic(err)}
-		}
 		jwt, exsit := ctx.Request.Header["Authorization"]
 		if exsit == true {
 			var c *Claims
 			c, err := ParseJWT(jwt[0][7:])
 			if err == nil {
-				retc, data := core(getBody, c)
-				if retc == RESP_OK_WITH_DATA {
-					okRespWithData(ctx, data)
-				} else {
-					quickResp(retc, ctx)
-				}
+				// retc, data := core(getBody, c)
+				ctx.Next();
 			} else {
 				quickResp(RESP_JWT_FAIL, ctx)
 				panic(err)
@@ -82,13 +71,19 @@ func JwtMiddleWare(ctx gin.Context) {
 	}
 }
 
-func jsonRequestMiddleWare(ctx *gin.Context) {
-	var getBody = func(i interface{}) {
-		data, err := ioutil.ReadAll(ctx.Request.Body)
-		if err != nil {panic(err)}
-		err = json.Unmarshal(data, i)
-		if err != nil {panic(err)}
+func jsonRequestMiddleWare() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var getBody = func(i interface{}) {
+			data, err := ioutil.ReadAll(ctx.Request.Body)
+			if err != nil {
+				panic(err)
+			}
+			err = json.Unmarshal(data, i)
+			if err != nil {
+				panic(err)
+			}
+		}
+		ctx.Set("getBody", getBody)
+		ctx.Next()
 	}
-	ctx.Set("getBody", getBody)
-	ctx.Next()
 }
