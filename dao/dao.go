@@ -79,7 +79,7 @@ func (d mongoDao) DeleteUserbyMicrsoftId(microsoftId string) {
 	ctx, cancel := context.WithTimeout(context.Background(), TIMEOUT_SECOND*time.Second)
 	defer cancel()
 	res := userCollection.FindOneAndDelete(ctx, bson.D{{"microsoft_id", microsoftId}})
-	if res.Err() != nil {return res.Err()}
+	if res.Err() != nil {panic(res.Err())}
 }
 
 func newMongoDao() *mongoDao {

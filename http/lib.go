@@ -2,6 +2,7 @@ package http
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 )
@@ -58,6 +59,7 @@ func jwtMiddleWare() gin.HandlerFunc {
 			var c *Claims
 			c, err := ParseJWT(jwt[0][7:])
 			ctx.Set("claim", c)
+			fmt.Println(c)
 			if err == nil {
 				ctx.Next()
 			} else {
