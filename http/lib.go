@@ -55,11 +55,11 @@ func JwtMiddleWare() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		jwt, exsit := ctx.Request.Header["Authorization"]
 		if exsit == true {
-			var _ *Claims
-			_, err := ParseJWT(jwt[0][7:])
+			var c *Claims
+			c, err := ParseJWT(jwt[0][7:])
+			ctx.Set("claim", c)
 			if err == nil {
-				// retc, data := core(getBody, c)
-				ctx.Next();
+				ctx.Next()
 			} else {
 				quickResp(RESP_JWT_FAIL, ctx)
 				panic(err)
@@ -71,7 +71,7 @@ func JwtMiddleWare() gin.HandlerFunc {
 	}
 }
 
-func jsonRequestMiddleWare() gin.HandlerFunc {
+func jsonParserMiddleWare() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var getBody = func(i interface{}) {
 			data, err := ioutil.ReadAll(ctx.Request.Body)
