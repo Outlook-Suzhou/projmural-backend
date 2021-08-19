@@ -33,29 +33,32 @@ func (d *mongoDao) Close() {
 	}
 }
 
-func (d mongoDao) insertUser(user User) error {
+func (d mongoDao) insertUser(user User) {
 	userCollection := d.mongoDatabase.Collection("user")
 	ctx, cancel := context.WithTimeout(context.Background(), TIMEOUT_SECOND*time.Second)
 	defer cancel()
 	_, err := userCollection.InsertOne(ctx, user.Bson())
-	return err
+	if err != nil {
+		panic(err)
+	}
 }
 
-func (d mongoDao) updateUserByMicrosoftId(microsoftId string, user User) error {
+func (d mongoDao) updateUserByMicrosoftId(microsoftId string, user User) {
 	userCollection := d.mongoDatabase.Collection("user")
 	ctx, cancel := context.WithTimeout(context.Background(), TIMEOUT_SECOND*time.Second)
 	defer cancel()
 	filter := bson.D{{"microsoft_id", microsoftId}}
 	replacement := user.Bson()
-	return userCollection.FindOneAndReplace(ctx, filter, replacement).Err()
+	err := userCollection.FindOneAndReplace(ctx, filter, replacement).Err()
+	if err != nil {panic(err)}
 }
 
-func (d mongoDao) InsertOrReplaceUserByMicrosoftId(user User) error {
+func (d mongoDao) InsertOrReplaceUserByMicrosoftId(user User) {
 	_, err := d.FindUserByMicrosoftId(user.MicrosoftId)
 	if err == mongo.ErrNoDocuments {
-		return d.insertUser(user)
+		d.insertUser(user)
 	}
-	return d.updateUserByMicrosoftId(user.MicrosoftId, user)
+	d.updateUserByMicrosoftId(user.MicrosoftId, user)
 }
 
 func (d mongoDao) FindUserByMicrosoftId(microsoftId string) (User, error) {
@@ -71,16 +74,22 @@ func (d mongoDao) FindUserByMicrosoftId(microsoftId string) (User, error) {
 	return user, nil
 }
 
-func (d mongoDao) DeleteUserbyMicrsoftId(microsoftId string) error {
+func (d mongoDao) DeleteUserbyMicrsoftId(microsoftId string) {
 	userCollection := d.mongoDatabase.Collection("user")
 	ctx, cancel := context.WithTimeout(context.Background(), TIMEOUT_SECOND*time.Second)
 	defer cancel()
 	res := userCollection.FindOneAndDelete(ctx, bson.D{{"microsoft_id", microsoftId}})
-	return res.Err()
+	if res.Err() != nil {return res.Err()}
 }
 
-func NewMongoDao() *mongoDao {
+func newMongoDao() *mongoDao {
 	dao := mongoDao{}
 	dao.Init()
 	return &dao
+}
+
+var MongoDatabase *mongoDao
+
+func Init(){
+	MongoDatabase = newMongoDao()
 }
