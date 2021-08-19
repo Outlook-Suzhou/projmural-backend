@@ -9,12 +9,12 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type mongoDao struct {
+type MongoDao struct {
 	mongoClient   *mongo.Client
 	mongoDatabase *mongo.Database
 }
 
-func (d *mongoDao) Init() {
+func (d *MongoDao) Init() {
 	ctx, cancel := context.WithTimeout(context.Background(), TIMEOUT_SECOND*time.Second)
 	defer cancel()
 	var err error
@@ -25,7 +25,7 @@ func (d *mongoDao) Init() {
 	d.mongoDatabase = d.mongoClient.Database(DATABASE_NAME)
 }
 
-func (d *mongoDao) Close() {
+func (d *MongoDao) Close() {
 	ctx, cancel := context.WithTimeout(context.Background(), TIMEOUT_SECOND*time.Second)
 	defer cancel()
 	if err := d.mongoClient.Disconnect(ctx); err != nil {
@@ -33,7 +33,7 @@ func (d *mongoDao) Close() {
 	}
 }
 
-func (d mongoDao) insertUser(user User) {
+func (d MongoDao) insertUser(user User) {
 	userCollection := d.mongoDatabase.Collection("user")
 	ctx, cancel := context.WithTimeout(context.Background(), TIMEOUT_SECOND*time.Second)
 	defer cancel()
@@ -43,7 +43,7 @@ func (d mongoDao) insertUser(user User) {
 	}
 }
 
-func (d mongoDao) updateUserByMicrosoftId(microsoftId string, user User) {
+func (d MongoDao) updateUserByMicrosoftId(microsoftId string, user User) {
 	userCollection := d.mongoDatabase.Collection("user")
 	ctx, cancel := context.WithTimeout(context.Background(), TIMEOUT_SECOND*time.Second)
 	defer cancel()
@@ -53,7 +53,7 @@ func (d mongoDao) updateUserByMicrosoftId(microsoftId string, user User) {
 	if err != nil {panic(err)}
 }
 
-func (d mongoDao) InsertOrReplaceUserByMicrosoftId(user User) {
+func (d MongoDao) InsertOrReplaceUserByMicrosoftId(user User) {
 	_, err := d.FindUserByMicrosoftId(user.MicrosoftId)
 	if err == mongo.ErrNoDocuments {
 		d.insertUser(user)
@@ -61,7 +61,7 @@ func (d mongoDao) InsertOrReplaceUserByMicrosoftId(user User) {
 	d.updateUserByMicrosoftId(user.MicrosoftId, user)
 }
 
-func (d mongoDao) FindUserByMicrosoftId(microsoftId string) (User, error) {
+func (d MongoDao) FindUserByMicrosoftId(microsoftId string) (User, error) {
 	userCollection := d.mongoDatabase.Collection("user")
 	ctx, cancel := context.WithTimeout(context.Background(), TIMEOUT_SECOND*time.Second)
 	defer cancel()
@@ -74,22 +74,19 @@ func (d mongoDao) FindUserByMicrosoftId(microsoftId string) (User, error) {
 	return user, nil
 }
 
-func (d mongoDao) DeleteUserbyMicrsoftId(microsoftId string) {
+func (d MongoDao) DeleteUserbyMicrsoftId(microsoftId string) {
 	userCollection := d.mongoDatabase.Collection("user")
 	ctx, cancel := context.WithTimeout(context.Background(), TIMEOUT_SECOND*time.Second)
 	defer cancel()
 	res := userCollection.FindOneAndDelete(ctx, bson.D{{"microsoft_id", microsoftId}})
 	if res.Err() != nil {panic(res.Err())}
 }
-
-func newMongoDao() *mongoDao {
-	dao := mongoDao{}
+var dao *MongoDao
+func NewMongoDao() *MongoDao {
+	dao = &MongoDao{}
 	dao.Init()
-	return &dao
+	return dao
 }
-
-var MongoDatabase *mongoDao
-
-func Init(){
-	MongoDatabase = newMongoDao()
+func GetMongoDao() *MongoDao {
+	return dao;
 }
