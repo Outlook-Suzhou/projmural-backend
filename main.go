@@ -1,6 +1,10 @@
 package main
 
 import (
+<<<<<<< HEAD
+=======
+	"github.com/gin-gonic/gin"
+>>>>>>> main
 	"projmural-backend/dao"
 	"projmural-backend/http"
 
@@ -8,6 +12,7 @@ import (
 )
 
 func main() {
+	dao.Init()
 	r := gin.Default()
 	dao.NewMongoDao()
 	r.GET("/ping", func(c *gin.Context) {
