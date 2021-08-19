@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -15,4 +16,12 @@ type User struct {
 func (u User) Bson() bson.D {
 	return bson.D{{"microsoft_id", u.MicrosoftId},
 		{"name", u.Name}, {"canvas", u.Canvas}}
+}
+
+func (u User) GinH() *gin.H {
+	return &gin.H{
+		"microsoft_id": u.MicrosoftId,
+		"name":         u.Name,
+		"canvas":       u.Canvas,
+	}
 }
