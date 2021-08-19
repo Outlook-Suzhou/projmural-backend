@@ -5,6 +5,7 @@ import (
 	"projmural-backend/dao"
 
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type UserRequest struct {
@@ -25,7 +26,13 @@ func user(ctx *gin.Context) {
 	getBody(&request)
 	switch request.Type {
 	case "query":
-		dataBase.FindUserByMicrosoftId(request.Data.MicrosoftId)
+		user, err := dataBase.FindUserByMicrosoftId(request.Data.MicrosoftId)
+		if(err == mongo.ErrNoDocuments) {
+			quickResp(RESP_USER_NOT_EXIST, ctx)
+			return;
+		} else {
+			okRespWithData(ctx, user.(interface{}))
+		}
 	case "update":
 		fmt.Println(request)
 		dataBase.InsertOrReplaceUserByMicrosoftId(request.Data)

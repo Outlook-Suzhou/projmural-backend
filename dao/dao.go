@@ -2,7 +2,6 @@ package dao
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -34,7 +33,7 @@ func (d *MongoDao) Close() {
 	}
 }
 
-func (d mongoDao) insertUser(user User) {
+func (d MongoDao) insertUser(user User) {
 	userCollection := d.mongoDatabase.Collection("user")
 	ctx, cancel := context.WithTimeout(context.Background(), TIMEOUT_SECOND*time.Second)
 	defer cancel()
@@ -44,7 +43,7 @@ func (d mongoDao) insertUser(user User) {
 	}
 }
 
-func (d mongoDao) updateUserByMicrosoftId(microsoftId string, user User) {
+func (d MongoDao) updateUserByMicrosoftId(microsoftId string, user User) {
 	userCollection := d.mongoDatabase.Collection("user")
 	ctx, cancel := context.WithTimeout(context.Background(), TIMEOUT_SECOND*time.Second)
 	defer cancel()
@@ -54,7 +53,7 @@ func (d mongoDao) updateUserByMicrosoftId(microsoftId string, user User) {
 	if err != nil {panic(err)}
 }
 
-func (d mongoDao) InsertOrReplaceUserByMicrosoftId(user User) {
+func (d MongoDao) InsertOrReplaceUserByMicrosoftId(user User) {
 	_, err := d.FindUserByMicrosoftId(user.MicrosoftId)
 	if err == mongo.ErrNoDocuments {
 		d.insertUser(user)
@@ -75,12 +74,12 @@ func (d MongoDao) FindUserByMicrosoftId(microsoftId string) (User, error) {
 	return user, nil
 }
 
-func (d mongoDao) DeleteUserbyMicrsoftId(microsoftId string) {
+func (d MongoDao) DeleteUserbyMicrsoftId(microsoftId string) {
 	userCollection := d.mongoDatabase.Collection("user")
 	ctx, cancel := context.WithTimeout(context.Background(), TIMEOUT_SECOND*time.Second)
 	defer cancel()
 	res := userCollection.FindOneAndDelete(ctx, bson.D{{"microsoft_id", microsoftId}})
-	if res.Err() != nil {return res.Err()}
+	if res.Err() != nil {panic(res.Err())}
 }
 var dao *MongoDao
 func NewMongoDao() *MongoDao {

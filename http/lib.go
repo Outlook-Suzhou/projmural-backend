@@ -12,6 +12,7 @@ const (
 	RESP_JWT_FAIL = -1
 	RESP_SERVER_ERROR = -2
 	RESP_ACCESS_TOKEN_FAIL = -3
+	RESP_USER_NOT_EXIST = -4
 )
 
 func quickResp(cmd int, ctx *gin.Context){
@@ -36,6 +37,11 @@ func quickResp(cmd int, ctx *gin.Context){
 			"msg": "access token fail",
 			"retc": cmd,
 		})
+	case RESP_USER_NOT_EXIST:
+		ctx.JSON(200, gin.H{
+			"msg": "user not exist",
+			"retc": cmd,
+		})	
 	}
 }
 
