@@ -52,7 +52,7 @@ type CoreFunction func(GetBodyFunction) (int, *gin.H)
 type CoreJwtFunction func(function GetBodyFunction, claims *Claims) (int, *gin.H)
 type GetBodyFunction func(interface{})
 
-func JwtMiddleWare(core CoreJwtFunction) gin.HandlerFunc {
+func JwtMiddleWare(ctx gin.Context) {
 	return func(ctx *gin.Context) {
 		var getBody = func(i interface{}) {
 			data, err := ioutil.ReadAll(ctx.Request.Body)
@@ -82,19 +82,13 @@ func JwtMiddleWare(core CoreJwtFunction) gin.HandlerFunc {
 	}
 }
 
-func RouterMiddleWare(core CoreFunction) gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		var getBody = func(i interface{}) {
-			data, err := ioutil.ReadAll(ctx.Request.Body)
-			if err != nil {panic(err)}
-			err = json.Unmarshal(data, i)
-			if err != nil {panic(err)}
-		}
-		retc, data := core(getBody)
-		if retc == RESP_OK_WITH_DATA{
-			okRespWithData(ctx, data)
-		} else {
-			quickResp(retc, ctx)
-		}
+func jsonRequestMiddleWare(ctx *gin.Context) {
+	var getBody = func(i interface{}) {
+		data, err := ioutil.ReadAll(ctx.Request.Body)
+		if err != nil {panic(err)}
+		err = json.Unmarshal(data, i)
+		if err != nil {panic(err)}
 	}
+	ctx.Set("getBody", getBody)
+	ctx.Next()
 }
