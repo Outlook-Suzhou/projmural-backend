@@ -1,7 +1,6 @@
 package http
 
 import (
-	"fmt"
 	"projmural-backend/dao"
 
 	"github.com/gin-gonic/gin"
@@ -27,18 +26,19 @@ func user(ctx *gin.Context) {
 	switch request.Type {
 	case "query":
 		user, err := dataBase.FindUserByMicrosoftId(request.Data.MicrosoftId)
-		if(err == mongo.ErrNoDocuments) {
+		if err == mongo.ErrNoDocuments {
 			quickResp(RESP_USER_NOT_EXIST, ctx)
-			return;
+			return
+		} else if err == nil {
+			okRespWithData(ctx, user.GinH())
+			return
 		} else {
-			okRespWithData(ctx, user.(interface{}))
+			panic(err)
 		}
 	case "update":
-		fmt.Println(request)
 		dataBase.InsertOrReplaceUserByMicrosoftId(request.Data)
 	case "insert":
 		dataBase.InsertOrReplaceUserByMicrosoftId(request.Data)
 	}
-
-
+	quickResp(RESP_OK, ctx)
 }
