@@ -51,7 +51,7 @@ type CoreFunction func(GetBodyFunction) (int, *gin.H)
 type CoreJwtFunction func(function GetBodyFunction, claims *Claims) (int, *gin.H)
 type GetBodyFunction func(interface{})
 
-func JwtMiddleWare() gin.HandlerFunc {
+func jwtMiddleWare() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		jwt, exsit := ctx.Request.Header["Authorization"]
 		if exsit == true {
