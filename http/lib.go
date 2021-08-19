@@ -73,7 +73,8 @@ func jwtMiddleWare() gin.HandlerFunc {
 
 func jsonParserMiddleWare() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var getBody = func(i interface{}) {
+		var getBody GetBodyFunction
+		getBody = func(i interface{}) {
 			data, err := ioutil.ReadAll(ctx.Request.Body)
 			if err != nil {
 				panic(err)
