@@ -14,6 +14,8 @@ const (
 	RESP_SERVER_ERROR = -2
 	RESP_ACCESS_TOKEN_FAIL = -3
 	RESP_USER_NOT_EXIST = -4
+	RESP_INVALID_OPERATION = -5
+	RESP_INVALID_JSON_FORMAT = -6
 )
 
 func quickResp(cmd int, ctx *gin.Context){
@@ -42,7 +44,17 @@ func quickResp(cmd int, ctx *gin.Context){
 		ctx.JSON(200, gin.H{
 			"msg": "user not exist",
 			"retc": cmd,
-		})	
+		})
+	case RESP_INVALID_OPERATION:
+		ctx.JSON(200, gin.H{
+			"msg": "invalid operation",
+			"retc": cmd,
+		})
+	case RESP_INVALID_JSON_FORMAT:
+		ctx.JSON(200, gin.H{
+			"msg": "invalid json format",
+			"retc": cmd,
+		})
 	}
 }
 
@@ -70,10 +82,12 @@ func jwtMiddleWare() gin.HandlerFunc {
 				ctx.Next()
 			} else {
 				quickResp(RESP_JWT_FAIL, ctx)
+				ctx.Abort()
 				panic(err)
 			}
 		} else {
 			quickResp(RESP_JWT_FAIL, ctx)
+			ctx.Abort()
 		}
 		return
 	}
@@ -89,6 +103,8 @@ func jsonParserMiddleWare() gin.HandlerFunc {
 			}
 			err = json.Unmarshal(data, i)
 			if err != nil {
+				quickResp(RESP_INVALID_JSON_FORMAT, ctx)
+				ctx.Abort()
 				panic(err)
 			}
 		}

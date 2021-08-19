@@ -39,6 +39,9 @@ func user(ctx *gin.Context) {
 		dataBase.InsertOrReplaceUserByMicrosoftId(request.Data)
 	case "insert":
 		dataBase.InsertOrReplaceUserByMicrosoftId(request.Data)
+	default:
+		quickResp(RESP_INVALID_OPERATION, ctx)
+		return
 	}
 	quickResp(RESP_OK, ctx)
 }
