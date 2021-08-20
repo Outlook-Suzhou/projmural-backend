@@ -2,9 +2,9 @@ package http
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
+	"time"
 )
 
 const (
@@ -18,44 +18,21 @@ const (
 	RESP_INVALID_JSON_FORMAT = -6
 )
 
+var respMsg = map[int]string {
+	RESP_OK: "ok",
+	RESP_JWT_FAIL: "jwt fail",
+	RESP_SERVER_ERROR: "server error",
+	RESP_ACCESS_TOKEN_FAIL: "access token fail",
+	RESP_USER_NOT_EXIST: "user not exist",
+	RESP_INVALID_OPERATION: "invalid operation",
+	RESP_INVALID_JSON_FORMAT: "invalid json format",
+}
+
 func quickResp(cmd int, ctx *gin.Context){
-	switch cmd {
-	case RESP_OK:
-		ctx.JSON(200, gin.H{
-			"msg": "ok",
-			"retc": cmd,
-		})
-	case RESP_JWT_FAIL:
-		ctx.JSON(200, gin.H{
-			"msg": "jwt fail",
-			"retc": cmd,
-		})
-	case RESP_SERVER_ERROR:
-		ctx.JSON(500, gin.H{
-			"msg": "server error",
-			"retc": cmd,
-		})
-	case RESP_ACCESS_TOKEN_FAIL:
-		ctx.JSON(200, gin.H{
-			"msg": "access token fail",
-			"retc": cmd,
-		})
-	case RESP_USER_NOT_EXIST:
-		ctx.JSON(200, gin.H{
-			"msg": "user not exist",
-			"retc": cmd,
-		})
-	case RESP_INVALID_OPERATION:
-		ctx.JSON(200, gin.H{
-			"msg": "invalid operation",
-			"retc": cmd,
-		})
-	case RESP_INVALID_JSON_FORMAT:
-		ctx.JSON(200, gin.H{
-			"msg": "invalid json format",
-			"retc": cmd,
-		})
-	}
+	ctx.JSON(200, gin.H{
+		"msg": respMsg[cmd],
+		"retc": cmd,
+	})
 }
 
 func okRespWithData(ctx *gin.Context, data *gin.H){
@@ -77,8 +54,12 @@ func jwtMiddleWare() gin.HandlerFunc {
 			var c *Claims
 			c, err := ParseJWT(jwt[0][7:])
 			ctx.Set("claim", c)
-			fmt.Println(c)
 			if err == nil {
+				if c.StandardClaims.ExpiresAt < time.Now().Unix() {
+					quickResp(RESP_JWT_FAIL, ctx)
+					ctx.Abort()
+					return
+				}
 				ctx.Next()
 			} else {
 				quickResp(RESP_JWT_FAIL, ctx)
