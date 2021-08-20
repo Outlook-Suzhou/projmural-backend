@@ -1,5 +1,24 @@
 # API 文档
 
+
+### POST /api/doc
+request
+```json
+{
+  "type": "create",
+  "data": {
+    "microsoft_id": "a string"
+  }
+}
+```
+respond
+{
+  "msg": "ok",
+  "retc": 0
+  // 0 z正常
+}
+
+
 ## POST /api/login
 
 request
