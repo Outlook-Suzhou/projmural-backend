@@ -5,19 +5,21 @@
 request
 ```json
 {
-  "type": "create",
+  "type": "create/get",
   "data": {
-    "microsoft_id": "a string"
+    "microsoft_id": "a string",
+    "canvas_id": "a string"  //get的时候需要传这个参数
   }
 }
 ```
 respond
+```json
 {
   "msg": "ok",
   "retc": 0
   // 0 z正常
 }
-
+```
 
 ## POST /api/login
 
