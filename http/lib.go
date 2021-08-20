@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
-	"time"
 )
 
 const (
@@ -16,6 +15,7 @@ const (
 	RESP_USER_NOT_EXIST = -4
 	RESP_INVALID_OPERATION = -5
 	RESP_INVALID_JSON_FORMAT = -6
+	RESP_PERMISSION_DENY = -7
 )
 
 var respMsg = map[int]string {
@@ -26,6 +26,7 @@ var respMsg = map[int]string {
 	RESP_USER_NOT_EXIST: "user not exist",
 	RESP_INVALID_OPERATION: "invalid operation",
 	RESP_INVALID_JSON_FORMAT: "invalid json format",
+	RESP_PERMISSION_DENY: "permission deny",
 }
 
 func quickResp(cmd int, ctx *gin.Context){
@@ -55,11 +56,6 @@ func jwtMiddleWare() gin.HandlerFunc {
 			c, err := ParseJWT(jwt[0][7:])
 			ctx.Set("claim", c)
 			if err == nil {
-				if c.StandardClaims.ExpiresAt < time.Now().Unix() {
-					quickResp(RESP_JWT_FAIL, ctx)
-					ctx.Abort()
-					return
-				}
 				ctx.Next()
 			} else {
 				quickResp(RESP_JWT_FAIL, ctx)
