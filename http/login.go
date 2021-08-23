@@ -3,8 +3,10 @@ package http
 import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/mongo"
 	"io/ioutil"
 	"net/http"
+	"projmural-backend/dao"
 )
 
 type LoginRequest struct {
@@ -13,6 +15,7 @@ type LoginRequest struct {
 
 type GraphRespond struct {
 	MicrosoftId string `json:"id"`
+	Name string `json:"displayName"`
 }
 
 func login(ctx *gin.Context) {
@@ -37,6 +40,16 @@ func login(ctx *gin.Context) {
 	err = json.Unmarshal(body, &graphResp)
 	if err != nil {panic(err)}
 	if graphResp.MicrosoftId == "" {quickResp(RESP_ACCESS_TOKEN_FAIL, ctx); return}
+
+	dataBase := dao.GetMongoDao()
+	_, err = dataBase.FindUserByMicrosoftId(graphResp.MicrosoftId)
+	if err == mongo.ErrNoDocuments {
+		dataBase.InsertOrReplaceUserByMicrosoftId(dao.User{
+			MicrosoftId: graphResp.MicrosoftId,
+			Name: graphResp.Name,
+		})
+	}
+
 	jwt, err := GenerateJWT(graphResp.MicrosoftId)
 	okRespWithData(ctx, &gin.H{"jwt": jwt})
 	return
