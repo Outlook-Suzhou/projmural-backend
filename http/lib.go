@@ -83,7 +83,7 @@ func jwtMiddleWare() gin.HandlerFunc {
 			} else {
 				quickResp(RESP_JWT_FAIL, ctx)
 				ctx.Abort()
-				panic(err)
+				return
 			}
 		} else {
 			quickResp(RESP_JWT_FAIL, ctx)
