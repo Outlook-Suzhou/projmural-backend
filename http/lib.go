@@ -75,9 +75,9 @@ func jsonParserMiddleWare() gin.HandlerFunc {
 		var getBody GetBodyFunction
 		getBody = func(i interface{}) {
 			data, err := ioutil.ReadAll(ctx.Request.Body)
-			if err != nil {
-				panic(err)
-			}
+			// if err != nil {
+			// panic(err)
+			// }
 			err = json.Unmarshal(data, i)
 			if err != nil {
 				quickResp(RESP_INVALID_JSON_FORMAT, ctx)

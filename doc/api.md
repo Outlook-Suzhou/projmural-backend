@@ -7,7 +7,7 @@ request
 ```json
 {
   "data": {
-    "microsoft_id": "a string"
+    "access_token": "a string"
   }
 }
 ```
