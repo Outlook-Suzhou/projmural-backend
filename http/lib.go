@@ -84,7 +84,7 @@ func jsonParserMiddleWare() gin.HandlerFunc {
 			if err != nil {
 				quickResp(RESP_INVALID_JSON_FORMAT, ctx)
 				ctx.Abort()
-				return
+				panic(err)
 			}
 		}
 		ctx.Set("getBody", getBody)
