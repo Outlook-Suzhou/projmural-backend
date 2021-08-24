@@ -1,3 +1,5 @@
-FROM go
-CMD ["go", "mod", "tidy"]
-ENTRYPOINT ["go","run","main.go"]
+FROM go:1.17.0-bullseye
+WORKDIR $GOPATH/src/projmural
+ADD . ./
+RUN go build -o projmural .
+ENTRYPOINT  ["./projmural"]
