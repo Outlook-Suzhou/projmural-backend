@@ -2,6 +2,7 @@ package http
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 )
@@ -78,11 +79,12 @@ func jsonParserMiddleWare() gin.HandlerFunc {
 			// if err != nil {
 			// panic(err)
 			// }
+			fmt.Printf("data:[%v]\nerr:[%v]\n", string(data), err)
 			err = json.Unmarshal(data, i)
 			if err != nil {
 				quickResp(RESP_INVALID_JSON_FORMAT, ctx)
 				ctx.Abort()
-				panic(err)
+				return
 			}
 		}
 		ctx.Set("getBody", getBody)
