@@ -1,6 +1,7 @@
 package http
 
 import (
+	"errors"
 	"projmural-backend/dao"
 
 	"github.com/gin-gonic/gin"
@@ -21,8 +22,15 @@ func user(ctx *gin.Context) {
 		return
 	}
 	var request UserRequest
-	var dataBase *dao.MongoDao = dao.GetMongoDao()
 	getBody(&request)
+	claimInterface, has := ctx.Get("claim")
+	if has == false {errors.New("claim is not exist")}
+	claim := claimInterface.(*Claims)
+	if claim.MicrosoftId != request.Data.MicrosoftId {
+		quickResp(RESP_PERMISSION_DENY, ctx)
+		return
+	}
+	var dataBase *dao.MongoDao = dao.GetMongoDao()
 	switch request.Type {
 	case "query":
 		user, err := dataBase.FindUserByMicrosoftId(request.Data.MicrosoftId)

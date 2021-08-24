@@ -8,13 +8,9 @@ import (
 )
 
 func main() {
-	r := gin.Default()
 	dao.NewMongoDao()
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
-	})
-	http.Init(r)
+	r := gin.Default()
+	api := r.Group("/api")
+	http.Init(api)
 	r.Run(":8081")
 }
