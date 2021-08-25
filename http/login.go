@@ -2,6 +2,7 @@ package http
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/mongo"
 	"io/ioutil"
@@ -16,6 +17,7 @@ type LoginRequest struct {
 type GraphRespond struct {
 	MicrosoftId string `json:"id"`
 	Name string `json:"displayName"`
+	Mail string `json:"mail"`
 }
 
 func login(ctx *gin.Context) {

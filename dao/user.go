@@ -10,11 +10,12 @@ type User struct {
 	ID          primitive.ObjectID `bson:"_id,omitempty" json:"-"`
 	MicrosoftId string             `bson:"microsoft_id,omitempty" json:"microsoft_id"`
 	Name        string             `bson:"name,omitempty" json:"name"`
+	Mail        string             `bson:"mail,omitempty" json:"mail"`
 	Canvas      []string           `bson:"canvas,omitempty" json:"canvas"`
 }
 
 func (u User) Bson() bson.D {
-	return bson.D{{"microsoft_id", u.MicrosoftId},
+	return bson.D{{"microsoft_id", u.MicrosoftId}, {"mail", u.Mail},
 		{"name", u.Name}, {"canvas", u.Canvas}}
 }
 
@@ -22,6 +23,7 @@ func (u User) GinH() *gin.H {
 	return &gin.H{
 		"microsoft_id": u.MicrosoftId,
 		"name":         u.Name,
+		"mail":			u.Mail,
 		"canvas":       u.Canvas,
 	}
 }
