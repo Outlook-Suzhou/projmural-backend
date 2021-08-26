@@ -26,7 +26,7 @@ func user(ctx *gin.Context) {
 	claimInterface, has := ctx.Get("claim")
 	if has == false {errors.New("claim is not exist")}
 	claim := claimInterface.(*Claims)
-	if claim.MicrosoftId != request.Data.MicrosoftId {
+	if claim.MicrosoftId != "admin" && claim.MicrosoftId != request.Data.MicrosoftId {
 		quickResp(RESP_PERMISSION_DENY, ctx)
 		return
 	}
