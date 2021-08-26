@@ -48,6 +48,8 @@ func login(ctx *gin.Context) {
 		dataBase.InsertOrReplaceUserByMicrosoftId(dao.User{
 			MicrosoftId: graphResp.MicrosoftId,
 			Name: graphResp.Name,
+			Mail: "",
+			Canvas: []dao.CanvaInfo{},
 		})
 	}
 
