@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"projmural-backend/dao"
+	"projmural-backend/pkg/config"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -34,7 +35,7 @@ func login(ctx *gin.Context) {
 
 	//send request to GRAPH_ME_ENDPOINT to get MicrosoftId
 	client := &http.Client{}
-	getRequest, _ := http.NewRequest("GET", GRAPH_ME_ENDPOINT, nil)
+	getRequest, _ := http.NewRequest("GET", config.Jwt.GraphMeEndpoint, nil)
 	getRequest.Header.Add("Authorization", "Bearer "+request.AccessToken)
 	respond, err := client.Do(getRequest)
 	if err != nil {
