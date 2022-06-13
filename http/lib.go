@@ -3,6 +3,7 @@ package http
 import (
 	"encoding/json"
 	"io/ioutil"
+	"projmural-backend/pkg/config"
 
 	"github.com/gin-gonic/gin"
 )
@@ -54,7 +55,7 @@ func jwtMiddleWare() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		jwt, exsit := ctx.Request.Header["Authorization"]
 		if exsit == true {
-			if jwt[0] == ADMIN_KEY {
+			if jwt[0] == config.Jwt.AdminKey {
 				c := &Claims{MicrosoftId: "admin"}
 				ctx.Set("claim", c)
 				ctx.Next()

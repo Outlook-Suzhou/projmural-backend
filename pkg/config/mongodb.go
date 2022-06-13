@@ -1,7 +1,7 @@
 package config
 
 type MongoConfig struct {
-	TimeoutSecond int    `yaml:"timeout_second"`
+	TimeoutSecond int64  `yaml:"timeout_second"`
 	ConnectUrl    string `yaml:"connect_url"`
 	DatabaseName  string `yaml:"database_name"`
 }
