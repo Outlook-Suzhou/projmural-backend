@@ -8,9 +8,9 @@ import (
 )
 
 func main() {
-	dao.NewMongoDao()
+	dao.NewMongoDao() //init mongodb
 	r := gin.Default()
 	api := r.Group("/api")
-	http.Init(api)
+	http.Init(api) //register route
 	r.Run(":8081")
 }
