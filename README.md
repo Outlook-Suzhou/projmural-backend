@@ -1,15 +1,15 @@
 # projmural-backend
 
 ## Configuration
-### app
+position: storage\env\{environment variables}\
+### app.yml
 ```yaml
 env: "local"
 name: "projmural"
-url: "localhost"
 port: "8081"
 ```
 
-### mongodb
+### mongodb.yml
 
 ```yaml
 timeout_second: 5
@@ -17,7 +17,7 @@ connect_url: "mongodb://localhost"
 database_name: "projmural"
 ```
 
-### jwt
+### jwt.yml
 ```yaml
 secret: "a string"
 expired_seconds: 10800 # 3h
