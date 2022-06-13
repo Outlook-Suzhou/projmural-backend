@@ -9,7 +9,7 @@ import (
 )
 
 type UserRequest struct {
-	Type string   `json:"type"`
+	Type string   `json:"type"` // operator type update/insert/query
 	Data dao.User `json:"data"`
 }
 
@@ -24,13 +24,19 @@ func user(ctx *gin.Context) {
 	var request UserRequest
 	getBody(&request)
 	claimInterface, has := ctx.Get("claim")
-	if has == false {errors.New("claim is not exist")}
+	if has == false {
+		errors.New("claim is not exist")
+	}
 	claim := claimInterface.(*Claims)
+
+	//check MicrosoftId in body and jwt
 	if claim.MicrosoftId != "admin" && claim.MicrosoftId != request.Data.MicrosoftId {
 		quickResp(RESP_PERMISSION_DENY, ctx)
 		return
 	}
 	var dataBase *dao.MongoDao = dao.GetMongoDao()
+
+	//do db operation based on request.Type
 	switch request.Type {
 	case "query":
 		user, err := dataBase.FindUserByMicrosoftId(request.Data.MicrosoftId)
