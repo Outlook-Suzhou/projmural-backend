@@ -155,3 +155,11 @@ RESP_INVALID_OPERATION: "invalid operation",
 RESP_INVALID_JSON_FORMAT: "invalid json format",
 }
 ```
+
+## run in docker
+```
+docker pull mongo
+docker run -p 27017:27017 --name my_mongo -itd mongo
+docker build -t backend:v1 .
+docker run -p 8081:8081 --name my_backend --link my_mongo -itd backend:v1 --env=docker
+```
