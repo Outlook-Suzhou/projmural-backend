@@ -2,9 +2,10 @@
 
 ## Configuration
 position: storage\env\{environment variables}\
+when running in docker, change it to storage\env\docker\
 ### app.yml
 ```yaml
-env: "local"
+env: "local" #when running in docker, change it to "docker" 
 name: "projmural"
 port: "8081"
 ```
@@ -13,17 +14,17 @@ port: "8081"
 
 ```yaml
 timeout_second: 5
-connect_url: "mongodb://localhost"
+connect_url: "mongodb://localhost" #when running in docker, change it to "mongodb://my_mongo" 
 database_name: "projmural"
 ```
 
 ### jwt.yml
 ```yaml
-secret: "a string"
+secret: "your secret"
 expired_seconds: 10800 # 3h
 issuer: "projmural"
 graph_me_endpoint: "https://graph.microsoft.com/v1.0/me" #https://docs.microsoft.com/en-us/graph/overview
-admin_key: "a string"
+admin_key: "your admin_key"
 ```
 
 ## Database
@@ -157,6 +158,12 @@ RESP_INVALID_JSON_FORMAT: "invalid json format",
 ```
 
 ## run in docker
+important：you should change the configuration files before running in docker.
+eg:
+related files position should in storage\env\docker\
+env in app.yml should be "docker"
+connect_url in mongodb.yml should be "mongodb://my_mongo"
+
 ```
 docker pull mongo
 docker run -p 27017:27017 --name my_mongo -itd mongo
