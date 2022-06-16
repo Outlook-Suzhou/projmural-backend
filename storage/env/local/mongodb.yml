@@ -1,0 +1,3 @@
+timeout_second: 5
+connect_url: "mongodb://localhost"
+database_name: "projmural"

@@ -170,3 +170,18 @@ docker run -p 27017:27017 --name my_mongo -itd mongo
 docker build -t backend:v1 .
 docker run -p 8081:8081 --name my_backend --link my_mongo -itd backend:v1 --env=docker
 ```
+docker run -p 80:80 --name my_nginx --link my_backend -itd nginx
+docker exec -it my_nginx /bin/bash
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    server {
+    	listen 80;
+			location / {
+								proxy_pass http://123.115.107.81:3000;
+						}
+    }
+}
