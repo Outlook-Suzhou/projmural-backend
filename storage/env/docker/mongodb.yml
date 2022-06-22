@@ -1,0 +1,3 @@
+timeout_second: 5
+connect_url: "mongodb://123.115.107.82" #based on ../projmural-frontend/docker-compose.yml
+database_name: "projmural"

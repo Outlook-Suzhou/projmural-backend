@@ -1,0 +1,5 @@
+secret: "projmural@#$ANc)$d*(anlrvGUEN_OC%2^&48"
+expired_seconds: 10800 # 3h
+issuer: "projmural"
+graph_me_endpoint: "https://graph.microsoft.com/v1.0/me" #https://docs.microsoft.com/en-us/graph/overview
+admin_key: "admin_key@&(Hcnc293)C8329h*(#(*C..1-r3k,"
