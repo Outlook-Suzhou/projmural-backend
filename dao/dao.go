@@ -3,6 +3,7 @@ package dao
 import (
 	"context"
 	"projmural-backend/pkg/config"
+	"sort"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -64,6 +65,18 @@ func (d MongoDao) InsertOrReplaceUserByMicrosoftId(user User) {
 	d.updateUserByMicrosoftId(user.MicrosoftId, user)
 }
 
+type RecentCanvaInfoArray []RecentCanvaInfo
+
+func (s RecentCanvaInfoArray) Len() int {
+	return len(s)
+}
+func (s RecentCanvaInfoArray) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+func (s RecentCanvaInfoArray) Less(i, j int) bool {
+	return s[i].RecentOpen > s[j].RecentOpen
+}
+
 func (d MongoDao) FindUserByMicrosoftId(microsoftId string) (User, error) {
 	userCollection := d.mongoDatabase.Collection("user")
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(config.Mongo.TimeoutSecond)*time.Second)
@@ -74,6 +87,7 @@ func (d MongoDao) FindUserByMicrosoftId(microsoftId string) (User, error) {
 	}
 	var user User
 	res.Decode(&user)
+	sort.Sort(RecentCanvaInfoArray(user.RecentCanvas))
 	return user, nil
 }
 

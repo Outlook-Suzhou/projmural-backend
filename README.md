@@ -46,7 +46,7 @@ type User struct {
 type CanvaInfo struct {
 	ID string `bson:"id" json:"id"`// more information is in sharedb, you could refer projmural-frontend
 	Name string `bson:"name" json:"name"`
-	RecentOpen int32 `bson:"recent_open", json:"recent_open"`
+	RecentOpen int64 `bson:"recent_open", json:"recent_open"`
 }
 ```
 

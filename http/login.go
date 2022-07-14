@@ -64,7 +64,10 @@ func login(ctx *gin.Context) {
 			MicrosoftId: graphResp.MicrosoftId,
 			Name:        graphResp.Name,
 			Mail:        "",
+			Photo:		 "",
 			Canvas:      []dao.CanvaInfo{},
+			RecentCanvas:      []dao.RecentCanvaInfo{},
+			Tasks:      []dao.TaskInfo{},
 		})
 	}
 
