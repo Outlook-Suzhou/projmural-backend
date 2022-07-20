@@ -38,6 +38,18 @@ func user(ctx *gin.Context) {
 
 	//do db operation based on request.Type
 	switch request.Type {
+	case "queryall":
+		users, err := dataBase.FindAllUsers()
+		if err == mongo.ErrNoDocuments {
+			quickResp(RESP_USER_NOT_EXIST, ctx)
+			return
+		} else if err == nil {
+			ginh_users := gin.H{"users": users}
+			okRespWithData(ctx, &ginh_users)
+			return
+		} else {
+			panic(err)
+		}
 	case "query":
 		user, err := dataBase.FindUserByMicrosoftId(request.Data.MicrosoftId)
 		if err == mongo.ErrNoDocuments {

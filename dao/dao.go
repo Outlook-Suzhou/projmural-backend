@@ -77,6 +77,27 @@ func (s RecentCanvaInfoArray) Less(i, j int) bool {
 	return s[i].RecentOpen > s[j].RecentOpen
 }
 
+func (d MongoDao) FindAllUsers() ([]User, error) {
+	userCollection := d.mongoDatabase.Collection("user")
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(config.Mongo.TimeoutSecond)*time.Second)
+	defer cancel()
+	var users []User
+	cur, err := userCollection.Find(ctx, bson.D{{}})
+	if err != nil {
+		return users, err
+	}
+
+	//Finding multiple documents returns a cursor
+	//Iterate through the cursor allows us to decode documents one at a time
+	for cur.Next(ctx) {
+		//Create a value into which the single document can be decoded
+		var elem User
+		cur.Decode(&elem)
+		users = append(users, elem)
+	}
+	return users, nil
+}
+
 func (d MongoDao) FindUserByMicrosoftId(microsoftId string) (User, error) {
 	userCollection := d.mongoDatabase.Collection("user")
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(config.Mongo.TimeoutSecond)*time.Second)
