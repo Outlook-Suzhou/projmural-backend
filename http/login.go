@@ -61,13 +61,13 @@ func login(ctx *gin.Context) {
 	_, err = dataBase.FindUserByMicrosoftId(graphResp.MicrosoftId)
 	if err == mongo.ErrNoDocuments {
 		dataBase.InsertOrReplaceUserByMicrosoftId(dao.User{
-			MicrosoftId: graphResp.MicrosoftId,
-			Name:        graphResp.Name,
-			Mail:        "",
-			Photo:		 "",
-			Canvas:      []dao.CanvaInfo{},
-			RecentCanvas:      []dao.RecentCanvaInfo{},
-			Tasks:      []dao.TaskInfo{},
+			MicrosoftId:  graphResp.MicrosoftId,
+			Name:         graphResp.Name,
+			Mail:         graphResp.Mail,
+			Photo:        "",
+			Canvas:       []dao.CanvaInfo{},
+			RecentCanvas: []dao.RecentCanvaInfo{},
+			Tasks:        []dao.TaskInfo{},
 		})
 	}
 

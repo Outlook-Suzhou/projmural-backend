@@ -152,6 +152,29 @@ respond:
 }
 
 ```
+### POST /api/sendmail
+
+Authorization：Bearer Token
+
+JWT is the Token
+
+request:
+```json
+{
+  "id":"#################",
+  "subject":"123456",
+  "content":"<b>123456789</b>"
+}
+```
+
+respond:
+
+```json
+{
+  "msg": "ok",
+  "retc": 0
+}
+```
 
 ### GET /api/currentUser
 Authorization：Bearer Token

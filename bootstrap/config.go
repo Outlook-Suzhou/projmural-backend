@@ -26,6 +26,10 @@ func LoadEnv(env string) {
 	jwtPath := path.Join(basePath, "jwt.yml")
 	loadConfig(jwtPath, &config.Jwt)
 	log.Println(config.Jwt)
+
+	mailPath := path.Join(basePath, "mail.yml")
+	loadConfig(mailPath, &config.Mail)
+	log.Println(config.Mail)
 }
 
 func loadConfig(path string, config interface{}) {

@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.7.4
+	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
 	go.mongodb.org/mongo-driver v1.7.1
 	gopkg.in/yaml.v2 v2.2.8
 )
