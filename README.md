@@ -27,6 +27,19 @@ graph_me_endpoint: "https://graph.microsoft.com/v1.0/me" #https://docs.microsoft
 admin_key: "your admin_key"
 ```
 
+### mail.yml
+```yaml
+smtp:
+  host: smtp.qq.com
+  port: 465
+  username: ################
+  password: ################
+
+from:
+  address: ################
+  name: ################
+```
+
 ## Database
 based on mongodb
 ``` go
@@ -36,17 +49,29 @@ type UserRequest struct {
 }
 
 type User struct {
-	ID          primitive.ObjectID `bson:"_id,omitempty" json:"-"`// id in mongodb
-	MicrosoftId string             `bson:"microsoft_id,omitempty" json:"microsoft_id"`
-	Name        string             `bson:"name,omitempty" json:"name"`
-	Mail        string             `bson:"mail,omitempty" json:"mail"`
-	Canvas      []CanvaInfo           `bson:"canvas,omitempty" json:"canvas"`
+	ID           primitive.ObjectID `bson:"_id,omitempty" json:"-"` // id in mongodb
+	MicrosoftId  string             `bson:"microsoft_id,omitempty" json:"microsoft_id"`
+	Name         string             `bson:"name,omitempty" json:"name"`
+	Mail         string             `bson:"mail,omitempty" json:"mail"`
+	Photo        string             `bson:"photo,omitempty" json:"photo"`
+	Canvas       []CanvaInfo        `bson:"canvas,omitempty" json:"canvas"`
+	RecentCanvas []RecentCanvaInfo  `bson:"recent_canvas,omitempty" json:"recent_canvas"`
+	Tasks        []TaskInfo         `bson:"tasks,omitempty" json:"tasks"`
 }
 
 type CanvaInfo struct {
-	ID string `bson:"id" json:"id"`// more information is in sharedb, you could refer projmural-frontend
-	Name string `bson:"name" json:"name"`
-	RecentOpen int64 `bson:"recent_open", json:"recent_open"`
+	ID   string `bson:"id" json:"id"` // more information is in sharedb, you could refer projmural-frontend
+	Type string `bson:"type" json:"type"`
+}
+
+type RecentCanvaInfo struct {
+	ID         string `bson:"id" json:"id"` // more information is in sharedb, you could refer projmural-frontend
+	RecentOpen int64  `bson:"recent_open" json:"recent_open"`
+}
+
+type TaskInfo struct {
+	ID   string `bson:"id" json:"id"` // more information is in sharedb, you could refer projmural-frontend
+	Type string `bson:"type" json:"type"`
 }
 ```
 
@@ -85,9 +110,9 @@ JWT is the Token
 request:
 ```json
 {
-  "type": "update/insert/query",
+  "type": "update/insert/query/queryall",
   "data": {
-    //when in query, only microsoft_id is needed
+    //when in query or queryall, only microsoft_id is needed
     "microsoft_id": "a string",
     "name": "a string",
     "canvas": ["canvaId1", "canvaId2"]
@@ -108,6 +133,24 @@ respond:
     "canvas": ["canvaId1", "canvaId2"]
   }
 }
+
+// when in query all, the data is like
+{
+  "msg": "ok",
+  "retc": 0,
+  "data": [{
+    "users": {
+	  "microsoft_id":"",
+	  "name":"",
+	  "mail":"",
+	  "photo":"",
+	  "canvas":"",
+	  "recent_canvas":"",
+	  "tasks":""
+    }
+  }]
+}
+
 ```
 
 ### GET /api/currentUser
@@ -157,31 +200,6 @@ RESP_INVALID_JSON_FORMAT: "invalid json format",
 }
 ```
 
-## run in docker
-important：you should change the configuration files before running in docker.
-eg:
-related files position should in storage\env\docker\
-env in app.yml should be "docker"
-connect_url in mongodb.yml should be "mongodb://my_mongo"
+## run
 
-```
-docker pull mongo
-docker run -p 27017:27017 --name my_mongo -itd mongo
-docker build -t backend:v1 .
-docker run -p 8081:8081 --name my_backend --link my_mongo -itd backend:v1 --env=docker
-```
-docker run -p 80:80 --name my_nginx --link my_backend -itd nginx
-docker exec -it my_nginx /bin/bash
-
-events {
-    worker_connections  1024;
-}
-
-http {
-    server {
-    	listen 80;
-			location / {
-								proxy_pass http://123.115.107.81:3000;
-						}
-    }
-}
+refer https://github.com/Outlook-Suzhou/projmural-frontend/wiki
