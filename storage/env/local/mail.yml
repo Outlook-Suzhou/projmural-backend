@@ -1,9 +1,9 @@
 smtp:
-  host: ########
-  port: ########
-  username: ########
-  password: ########
+  host: smtp.office365.com
+  port: 587
+  username:
+  password:
 
 from:
-  address: ########
-  name: ########
+  address:
+  name:

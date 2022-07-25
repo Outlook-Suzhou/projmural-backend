@@ -6,9 +6,43 @@ import (
 	"log"
 	"net/smtp"
 	"projmural-backend/pkg/config"
+	"strings"
 
 	emailPKG "github.com/jordan-wright/email"
 )
+
+type loginAuth struct {
+	username, password string
+}
+
+// loginAuth returns an Auth that implements the LOGIN authentication
+// mechanism as defined in RFC 4616.
+func LoginAuth(username, password string) smtp.Auth {
+	return &loginAuth{username, password}
+}
+
+func (a *loginAuth) Start(server *smtp.ServerInfo) (string, []byte, error) {
+	return "LOGIN", nil, nil
+}
+
+func (a *loginAuth) Next(fromServer []byte, more bool) ([]byte, error) {
+	command := string(fromServer)
+	command = strings.TrimSpace(command)
+	command = strings.TrimSuffix(command, ":")
+	command = strings.ToLower(command)
+
+	if more {
+		if command == "username" {
+			return []byte(fmt.Sprintf("%s", a.username)), nil
+		} else if command == "password" {
+			return []byte(fmt.Sprintf("%s", a.password)), nil
+		} else {
+			// We've already sent everything.
+			return nil, fmt.Errorf("unexpected server challenge: %s", command)
+		}
+	}
+	return nil, nil
+}
 
 // SMTP 实现 email.Driver interface
 type SMTP struct{}
@@ -28,15 +62,9 @@ func (s *SMTP) Send(email Email, config config.MailConfig) bool {
 
 	log.Println(e)
 
-	err := e.SendWithTLS(
+	err := e.SendWithStartTLS(
 		fmt.Sprintf("%v:%v", config.Smtp.Host, config.Smtp.Port),
-
-		smtp.PlainAuth(
-			"",
-			config.Smtp.Username,
-			config.Smtp.Password,
-			config.Smtp.Host,
-		),
+		LoginAuth(config.Smtp.Username, config.Smtp.Password),
 		&tls.Config{
 			ServerName: config.Smtp.Host,
 		},
